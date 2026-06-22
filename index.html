@@ -1,1 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Taha Khalifa - Interactive Portfolio Reel</title>
+    <style>
+        :root {
+            --primary: #00e5ff;
+            --bg-dark: #0a0c10;
+            --panel-bg: rgba(20, 25, 35, 0.85);
+            --text-main: #f0f4f8;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Video Frame Simulation */
+        .video-container {
+            position: relative;
+            width: 95vw;
+            height: 90vh;
+            max-width: 1400px;
+            background: #000;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+            border: 2px solid #1a2230;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Left Side: Dynamic Dynamic "Video Feed" Screen */
+        .video-viewport {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+            background: radial-gradient(circle at center, #142035 0%, #050811 100%);
+            transition: all 0.5s ease;
+        }
+
+        /* Overlay scanning line grid effect for video feel */
+        .video-viewport::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Live Rec Indicator */
+        .rec-indicator {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #ff3333;
+            font-size: 0.85rem;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: #ff3333;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* Active content slide view inside viewport */
+        .content-slide {
+            max-width: 750px;
+            margin: auto 0;
+            z-index: 5;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: none;
+        }
+
+        .content-slide.active {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .content-slide h2 {
+            font-size: 3rem;
+            color: #fff;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .content-slide h2 span {
+            color: var(--primary);
+        }
+
+        .content-slide p {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: #b0c4de;
+        }
+
+        .badges {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(0, 229, 255, 0.15);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Video Controls Footer UI */
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            padding: 20px 30px;
+            z-index: 10;
+        }
+
+        .timeline-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .timeline-progress {
+            height: 100%;
+            width: 20%;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: width 0.3s linear;
+        }
+
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .left-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .play-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: transform 0.2s;
+        }
+        
+        .play-btn:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* Right Side: Playlist / Interactive Chapter Guide */
+        .playlist-sidebar {
+            width: 380px;
+            background: var(--panel-bg);
+            border-left: 1px solid #1a2230;
+            display: flex;
+            flex-direction: column;
+            z-index: 5;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-header {
+            padding: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .chapter-list {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .chapter-item {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            cursor: pointer;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .chapter-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .chapter-item.active {
+            background: rgba(0, 229, 255, 0.08);
+            border-left: 4px solid var(--primary);
+        }
+
+        .chapter-thumb {
+            width: 70px;
+            height: 45px;
+            background: #111;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--primary);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-weight: bold;
+        }
+
+        .chapter-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .chapter-info p {
+            font-size: 0.8rem;
+            color: #8a99ad;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-container">
+        <!-- Main Media Feed Window -->
+        <div class="video-viewport" id="viewport">
+            <div class="rec-indicator">
+                <div class="dot"></div> LIVE REEL
+            </div>
+
+            <!-- Slide 1: Intro -->
+            <div class="content-slide active" data-progress="20">
+                <h2>Dr. Taha Khalifa <span>Elseaidy</span></h2>
+                <p>Expert Cosmetic & Restorative Dentist delivering advanced surgical and microscopic dental solutions designed for modern patient care.</p>
+                <div class="badges">
+                    <span class="badge">Giza, Egypt</span>
+                    <span class="badge">Cosmetics & Surgery</span>
+                </div>
+            </div>
+
+            <!-- Slide 2: Surgical Residency -->
+            <div class="content-slide" data-progress="40">
+                <h2>Maxillofacial <span>Residency</span></h2>
+                <p>Completed a high-intensity 3-Month Visiting Residency in the Oral and Maxillofacial Surgery Department at Cairo University (Al-Qasr Al-Ainy) with an outstanding evaluation score of 95%.</p>
+                <div class="badges">
+                    <span class="badge">Al-Qasr Al-Ainy</span>
+                    <span class="badge">95% Grade Score</span>
+                    <li>Oral Surgery</li>
+                </div>
+            </div>
+
+            <!-- Slide 3: Advanced Cosmetics -->
+            <div class="content-slide" data-progress="60">
+                <h2>Clinical <span>Expertise</span></h2>
+                <p>Mastered precision Cosmetics & Implant systems at MSA University and Mediance Academy. Fully proficient in Laser dentistry, full-arch implants (All-on-4/6), veneers, and digital smile design workflow.</p>
+                <div class="badges">
+                    <span class="badge">All-on-4/6 Implant</span>
+                    <span class="badge">Microscopic Endodontics</span>
+                    <span class="badge">Laser & Botox</span>
+                </div>
+            </div>
+
+            <!-- Slide 4: Global & Linguistics -->
+            <div class="content-slide" data-progress="80">
+                <h2>Global <span>Standards</span></h2>
+                <p>Equipped with international practice standards, verified via a professional TOEFL certification. Native Arabic fluency combined with professional English proficiency and advanced French capabilities.</p>
+                <div class="badges">
+                    <span class="badge">TOEFL Certified</span>
+                    <span class="badge">English & French</span>
+                    <span class="badge">IDEX Speaker/Leader</span>
+                </div>
+            </div>
+
+            <!-- Fake Video Controls Integration -->
+            <div class="video-controls">
+                <div class="timeline-bar" onclick="resetTimeline()">
+                    <div class="timeline-progress" id="progress-bar"></div>
+                </div>
+                <div class="control-buttons">
+                    <div class="left-controls">
+                        <button class="play-btn" id="playBtn">⏸</button>
+                        <span style="font-size: 0.85rem; color:#8a99ad;">0:02 / 0:10 • Auto-Playing Loop</span>
+                    </div>
+                    <div style="font-size:0.85rem; color: var(--primary);">1080p HD</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Playlist Chapters Panel -->
+        <div class="playlist-sidebar">
+            <div class="sidebar-header">
+                <h3>REEL CHAPTERS</h3>
+                <p style="font-size:0.8rem; color:#8a99ad; margin-top:4px;">Select to skip directly to section</p>
+            </div>
+            <ul class="chapter-list">
+                <li class="chapter-item active" onclick="changeSlide(0)">
+                    <div class="chapter-thumb">01 / 04</div>
+                    <div class="chapter-info">
+                        <h4>Profile Overview</h4>
+                        <p>Summary & Focus</p>
+                    </div>
+                </li>
+                <li class="chapter-item" onclick="changeSlide(1)">
+                    <div class="chapter-thumb">02 / 04</div>
+                    <div class="chapter-info">
+                        <h4>Maxillofacial Residency</h4>
+                        <p>Al-Qasr Al-Ainy (95%)</p>
+                    </div>
+                </li>
+                <li class="chapter-item" onclick="changeSlide(2)">
+                    <div class="chapter-thumb">03 / 04</div>
+                    <div class="chapter-info">
+                        <h4>Cosmetics & Implants</h4>
+                        <p>Clinical Mastery Courses</p>
+                    </div>
+                </li>
+                <li class="chapter-item" onclick="changeSlide(3)">
+                    <div class="chapter-thumb">04 / 04</div>
+                    <div class="chapter-info">
+                        <h4>Linguistics & Certs</h4>
+                        <p>TOEFL & Global Skills</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.content-slide');
+        const chapters = document.querySelectorAll('.chapter-item');
+        const progressBar = document.getElementById('progress-bar');
+        const playBtn = document.getElementById('playBtn');
+        let currentIdx = 0;
+        let isPlaying = true;
+
+        function changeSlide(idx) {
+            slides[currentIdx].classList.remove('active');
+            chapters[currentIdx].classList.remove('active');
+            
+            currentIdx = idx;
+            
+            slides[currentIdx].classList.add('active');
+            chapters[currentIdx].classList.add('active');
+            
+            const progressVal = slides[currentIdx].getAttribute('data-progress');
+            progressBar.style.width = `${progressVal}%`;
+        }
+
+        // Toggle Play/Pause UI Simulation
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playBtn.innerText = isPlaying ? '⏸' : '▶';
+        });
+
+        // Simple Automated loop simulating playback
+        setInterval(() => {
+            if(isPlaying){
+                let next = (currentIdx + 1) % slides.length;
+                changeSlide(next);
+            }
+        }, 3500);
+    </script>
+</body>
+</html>
