@@ -1,419 +1,1279 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. Taha Khalifa - Interactive Portfolio Reel</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dr. Taha Khalifa · Dental Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #00e5ff;
-            --bg-dark: #0a0c10;
-            --panel-bg: rgba(20, 25, 35, 0.85);
-            --text-main: #f0f4f8;
-        }
-
-        * {
+        /* ── reset & base ── */
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            /* Light theme (default) */
+            --bg: #f5f7fa;
+            --surface: #ffffff;
+            --surface-hover: #f0f3f7;
+            --border: #e2e8f0;
+            --text: #1a202c;
+            --text-dim: #4a5568;
+            --text-muted: #718096;
+            --primary: #0d7c8c;
+            --primary-light: #e6f4f6;
+            --primary-dark: #0a5f6b;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.10);
+            --radius: 16px;
+            --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --max-width: 1120px;
+            --nav-bg: rgba(255, 255, 255, 0.85);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface-hover: #1c2333;
+            --border: #30363d;
+            --text: #f0f6fc;
+            --text-dim: #b0b8c4;
+            --text-muted: #8b949e;
+            --primary: #58b9c9;
+            --primary-light: #1a2a33;
+            --primary-dark: #4aa8b8;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.5);
+            --nav-bg: rgba(13, 17, 23, 0.9);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background var(--transition), color var(--transition);
+            padding-top: 70px;
         }
 
-        /* Video Frame Simulation */
-        .video-container {
-            position: relative;
-            width: 95vw;
-            height: 90vh;
-            max-width: 1400px;
-            background: #000;
-            border-radius: 16px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
-            border: 2px solid #1a2230;
-            display: flex;
-            overflow: hidden;
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-
-        /* Left Side: Dynamic Dynamic "Video Feed" Screen */
-        .video-viewport {
-            flex: 1;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 40px;
-            background: radial-gradient(circle at center, #142035 0%, #050811 100%);
-            transition: all 0.5s ease;
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
         }
-
-        /* Overlay scanning line grid effect for video feel */
-        .video-viewport::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2;
-            background-size: 100% 4px, 6px 100%;
-            pointer-events: none;
-        }
-
-        /* Live Rec Indicator */
-        .rec-indicator {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            color: #ff3333;
-            font-size: 0.85rem;
-            z-index: 10;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            background-color: #ff3333;
-            border-radius: 50%;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-
-        /* Active content slide view inside viewport */
-        .content-slide {
-            max-width: 750px;
-            margin: auto 0;
-            z-index: 5;
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            display: none;
-        }
-
-        .content-slide.active {
-            display: block;
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .content-slide h2 {
-            font-size: 3rem;
-            color: #fff;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        .content-slide h2 span {
-            color: var(--primary);
-        }
-
-        .content-slide p {
-            font-size: 1.15rem;
-            line-height: 1.7;
-            color: #b0c4de;
-        }
-
-        .badges {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            background: rgba(0, 229, 255, 0.15);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        /* Video Controls Footer UI */
-        .video-controls {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
-            padding: 20px 30px;
-            z-index: 10;
-        }
-
-        .timeline-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .timeline-progress {
-            height: 100%;
-            width: 20%;
+        ::-webkit-scrollbar-thumb {
             background: var(--primary);
-            border-radius: 3px;
-            transition: width 0.3s linear;
+            border-radius: 8px;
         }
 
-        .control-buttons {
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px 60px;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            transition: background var(--transition), border-color var(--transition);
+            height: 70px;
             display: flex;
             align-items: center;
+        }
+
+        .nav-container {
+            max-width: var(--max-width);
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
             justify-content: space-between;
-        }
-
-        .left-controls {
-            display: flex;
             align-items: center;
-            gap: 20px;
         }
 
-        .play-btn {
+        .nav-logo {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-logo span {
+            color: var(--text);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary);
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
             background: none;
             border: none;
-            color: #fff;
-            cursor: pointer;
-            font-size: 1.5rem;
-            transition: transform 0.2s;
-        }
-        
-        .play-btn:hover {
-            color: var(--primary);
-            transform: scale(1.1);
+            padding: 4px;
         }
 
-        /* Right Side: Playlist / Interactive Chapter Guide */
-        .playlist-sidebar {
-            width: 380px;
-            background: var(--panel-bg);
-            border-left: 1px solid #1a2230;
-            display: flex;
-            flex-direction: column;
-            z-index: 5;
-            backdrop-filter: blur(10px);
-        }
-
-        .sidebar-header {
-            padding: 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .sidebar-header h3 {
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-        }
-
-        .chapter-list {
-            list-style: none;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .chapter-item {
-            padding: 20px 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            cursor: pointer;
-            display: flex;
-            gap: 15px;
-            align-items: center;
+        .nav-toggle span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
             transition: all 0.3s;
         }
 
-        .chapter-item:hover {
-            background: rgba(255,255,255,0.05);
+        /* ── theme toggle (moved to navbar) ── */
+        .nav-theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 60px;
+            padding: 4px 10px 4px 14px;
+            box-shadow: var(--shadow);
+            transition: all var(--transition);
+            cursor: pointer;
+            margin-left: 4px;
         }
 
-        .chapter-item.active {
-            background: rgba(0, 229, 255, 0.08);
-            border-left: 4px solid var(--primary);
+        .nav-theme-toggle:hover {
+            box-shadow: var(--shadow-hover);
         }
 
-        .chapter-thumb {
-            width: 70px;
-            height: 45px;
-            background: #111;
-            border-radius: 4px;
+        .nav-theme-toggle .label {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .theme-toggle-mini {
+            position: relative;
+            width: 38px;
+            height: 22px;
+            background: var(--border);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background var(--transition);
+            flex-shrink: 0;
+            border: none;
+            outline: none;
+        }
+
+        .theme-toggle-mini .thumb {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            transition: transform var(--transition), background var(--transition);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        [data-theme="dark"] .theme-toggle-mini {
+            background: var(--primary);
+        }
+
+        [data-theme="dark"] .theme-toggle-mini .thumb {
+            transform: translateX(16px);
+            background: #fff;
+        }
+
+        .theme-toggle-mini .icon-sun,
+        .theme-toggle-mini .icon-moon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            line-height: 1;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .theme-toggle-mini .icon-sun {
+            left: 5px;
+            opacity: 0;
+        }
+
+        .theme-toggle-mini .icon-moon {
+            right: 5px;
+            opacity: 1;
+        }
+
+        [data-theme="dark"] .theme-toggle-mini .icon-sun {
+            opacity: 1;
+        }
+
+        [data-theme="dark"] .theme-toggle-mini .icon-moon {
+            opacity: 0;
+        }
+
+        /* ── header / hero ── */
+        .hero {
+            padding: 60px 0 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 50px;
+        }
+
+        .hero-content {
+            flex: 1 1 400px;
+        }
+
+        /* ── 3D Tooth – BIG, NO FRAME ── */
+        .hero-image {
+            flex: 0 0 220px;
+            height: 220px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            transition: all var(--transition);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 8px 24px rgba(0,0,0,0.08));
+            transition: transform 0.4s ease;
+        }
+
+        .hero-image:hover img {
+            transform: scale(1.04) rotate(-2deg);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 4px 16px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            border: 1px solid rgba(13, 124, 140, 0.15);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 6vw, 3.4rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.08;
+            margin-bottom: 6px;
+        }
+
+        .hero h1 .highlight {
             color: var(--primary);
-            border: 1px solid rgba(255,255,255,0.1);
-            font-weight: bold;
         }
 
-        .chapter-info h4 {
+        .hero .title-role {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        .hero .tagline {
             font-size: 0.95rem;
-            margin-bottom: 4px;
-            color: #fff;
+            color: var(--text-muted);
+            max-width: 500px;
+            line-height: 1.7;
         }
 
-        .chapter-info p {
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 28px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .hero-meta a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .hero-meta a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .hero-meta .icon {
+            opacity: 0.6;
+            font-size: 1rem;
+        }
+
+        /* ── sections ── */
+        section {
+            margin-bottom: 52px;
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-label {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .section-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            color: var(--text);
+        }
+
+        .section-title .accent {
+            color: var(--primary);
+        }
+
+        /* ── summary ── */
+        .summary-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            box-shadow: var(--shadow);
+            transition: all var(--transition);
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-dim);
+        }
+
+        .summary-box:hover {
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+
+        .summary-box strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* ── cards ── */
+        .card-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .card-grid.two {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            transition: all var(--transition);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+
+        .card .tag {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2px 14px;
+            border-radius: 60px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(13, 124, 140, 0.10);
+        }
+
+        .card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+            color: var(--text);
+        }
+
+        .card .sub {
             font-size: 0.8rem;
-            color: #8a99ad;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .card .desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        .card .year {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── experience ── */
+        .exp-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .exp-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            transition: all var(--transition);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .exp-item:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
+            transform: translateX(4px);
+        }
+
+        .exp-item .exp-left {
+            flex: 0 0 120px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            padding-top: 2px;
+        }
+
+        .exp-item .exp-right {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .exp-item .exp-right h3 {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text);
+            margin-bottom: 1px;
+        }
+
+        .exp-item .exp-right .org {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .exp-item .exp-right .desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        .exp-item .exp-right .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .exp-item .exp-right .tags span {
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            padding: 2px 14px;
+            border-radius: 60px;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+        }
+
+        /* ── skills ── */
+        .skills-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .skill-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 8px 20px 8px 18px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+            transition: all var(--transition);
+            box-shadow: var(--shadow);
+            cursor: default;
+        }
+
+        .skill-tag:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .skill-tag .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            opacity: 0.4;
+            transition: opacity 0.3s;
+        }
+
+        .skill-tag:hover .dot {
+            opacity: 1;
+        }
+
+        /* ── languages ── */
+        .lang-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 6px 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .lang-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .lang-item:last-child {
+            border-bottom: none;
+        }
+
+        .lang-item .name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .lang-item .level {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .lang-item .level .bars {
+            display: flex;
+            gap: 4px;
+        }
+
+        .lang-item .level .bars span {
+            display: block;
+            width: 20px;
+            height: 4px;
+            border-radius: 4px;
+            background: var(--border);
+            transition: background 0.6s;
+        }
+
+        .lang-item .level .bars span.fill {
+            background: var(--primary);
+        }
+
+        /* ── clinical gallery (5 images) ── */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-top: 8px;
+        }
+
+        .image-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            transition: all var(--transition);
+            aspect-ratio: 1.2 / 1;
+            position: relative;
+        }
+
+        .image-card:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-card .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 16px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .image-card:hover .overlay {
+            opacity: 1;
+        }
+
+        /* ── footer ── */
+        footer {
+            margin-top: 60px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ── responsive ── */
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: var(--nav-bg);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                padding: 24px;
+                gap: 16px;
+                border-bottom: 1px solid var(--border);
+                transform: translateY(-120%);
+                transition: transform 0.4s ease;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .nav-menu.active {
+                transform: translateY(0);
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-theme-toggle .label {
+                display: none;
+            }
+
+            .nav-theme-toggle {
+                padding: 4px 8px;
+            }
+
+            .hero {
+                padding-top: 40px;
+                flex-direction: column-reverse;
+                text-align: center;
+            }
+
+            .hero-image {
+                flex: 0 0 180px;
+                height: 180px;
+            }
+
+            .hero .tagline {
+                max-width: 100%;
+            }
+
+            .hero-meta {
+                justify-content: center;
+            }
+
+            .section-title {
+                font-size: 1.4rem;
+            }
+
+            .exp-item .exp-left {
+                flex: 0 0 100%;
+                font-size: 0.7rem;
+            }
+
+            .card-grid.two {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-box {
+                padding: 20px 18px;
+                font-size: 0.9rem;
+            }
+
+            .lang-item {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            .lang-item .level {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .container {
+                padding: 0 16px 40px;
+            }
+
+            .image-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-image {
+                flex: 0 0 150px;
+                height: 150px;
+            }
+
+            .card {
+                padding: 16px 18px;
+            }
+
+            .exp-item {
+                padding: 14px 16px;
+            }
+
+            .image-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="video-container">
-        <!-- Main Media Feed Window -->
-        <div class="video-viewport" id="viewport">
-            <div class="rec-indicator">
-                <div class="dot"></div> LIVE REEL
-            </div>
+    <!-- ====== CONTAINER ====== -->
+    <div class="container">
 
-            <!-- Slide 1: Intro -->
-            <div class="content-slide active" data-progress="20">
-                <h2>Dr. Taha Khalifa <span>Elseaidy</span></h2>
-                <p>Expert Cosmetic & Restorative Dentist delivering advanced surgical and microscopic dental solutions designed for modern patient care.</p>
-                <div class="badges">
-                    <span class="badge">Giza, Egypt</span>
-                    <span class="badge">Cosmetics & Surgery</span>
+        <!-- ====== HERO ====== -->
+        <header class="hero" id="hero">
+            <div class="hero-content">
+                <div class="hero-badge">✦ DDS · Cosmetic &amp; Restorative</div>
+                <h1>
+                    Dr. Taha <br /><span class="highlight">Khalifa</span>
+                </h1>
+                <div class="title-role">Dental Surgeon · Educator · Innovator</div>
+                <p class="tagline">
+                    Combining clinical excellence with a patient-first approach.
+                    Specializing in cosmetic dentistry, implants, and advanced
+                    endodontic care.
+                </p>
+                <div class="hero-meta">
+                    <span>
+                        <span class="icon">📞</span>
+                        <a href="tel:01003023879">0100 302 3879</a>
+                    </span>
+                    <span>
+                        <span class="icon">📧</span>
+                        <a href="mailto:studentkhalefa@gmail.com">taha@dental.com</a>
+                    </span>
+                    <span>
+                        <span class="icon">🔗</span>
+                        <a href="linkedin.com/in/taha-khalifa-583060371" target="_blank">linkedin.com/in/taha-khalifa</a>
+                    </span>
+                    <span>
+                        <span class="icon">📍</span>
+                        2 Henediy St, Haram, Giza
+                    </span>
                 </div>
             </div>
+            <!-- 3D Tooth – BIG, NO FRAME -->
+            <div class="hero-image">
+                <img src="https://static.vecteezy.com/system/resources/previews/062/676/417/non_2x/hyper-realistic-3d-tooth-model-detailed-dental-anatomy-with-smooth-white-enamel-free-png.png" alt="3D Tooth" loading="lazy" />
+            </div>
+        </header>
 
-            <!-- Slide 2: Surgical Residency -->
-            <div class="content-slide" data-progress="40">
-                <h2>Maxillofacial <span>Residency</span></h2>
-                <p>Completed a high-intensity 3-Month Visiting Residency in the Oral and Maxillofacial Surgery Department at Cairo University (Al-Qasr Al-Ainy) with an outstanding evaluation score of 95%.</p>
-                <div class="badges">
-                    <span class="badge">Al-Qasr Al-Ainy</span>
-                    <span class="badge">95% Grade Score</span>
-                    <li>Oral Surgery</li>
+        <!-- ====== SUMMARY ====== -->
+        <section id="summary">
+            <div class="section-label">About</div>
+            <h2 class="section-title">Professional <span class="accent">Summary</span></h2>
+            <div class="summary-box">
+                Experienced in <strong>cosmetic and restorative dentistry</strong>, with hands-on training in laser treatments, veneers, digital smile design, implants, and microscopic endodontics at MSA University. Recognized for leadership in dental conferences and academic initiatives, I combine strong clinical skills with <strong>management, communication, and patient-centered care</strong>. My goal is to apply innovative techniques to deliver high-quality dental solutions and support practice growth.
+            </div>
+        </section>
+
+        <!-- ====== CLINICAL GALLERY ====== -->
+        <section id="gallery">
+            <div class="section-label">Visual</div>
+            <h2 class="section-title">Clinical <span class="accent">Highlights</span></h2>
+            <div class="image-grid">
+                <div class="image-card">
+                    <img
+                    src="https://oralsurgerycenterofseattle.com/wp-content/uploads/sites/616/2020/04/OralSurgery2.jpg.optimal.jpg"
+                    alt="Oral Surgery"
+                    loading="lazy"
+                    />
+                    <div class="overlay">Surgery</div>
+                </div>
+                <div class="image-card">
+                    <img
+                    src="https://img.freepik.com/premium-photo/tooth-implant-installed-jaw-dental-surgery_77190-19604.jpg?w=2000"
+                    alt="Dental Implants"
+                    loading="lazy"
+                    />
+                    <div class="overlay">Implants</div>
+                </div>
+                <div class="image-card">
+                    <img
+                    src="https://mypenndentist.org/wp-content/uploads/2019/05/shutterstock_1784932625-scaled.jpg"
+                    alt="Cosmetic Dentistry"
+                    loading="lazy"
+                    />
+                    <div class="overlay">Cosmetics &amp; Veneers</div>
+                </div>
+                <div class="image-card">
+                    <img
+                    src="https://thf.bing.com/th/id/R.635c310cc5f91b8ba83501f13fef2e8a?rik=B%2bPMUQYkcoXRew&pid=ImgRaw&r=0"
+                    alt="Laser Dentistry"
+                    loading="lazy"
+                    />
+                    <div class="overlay">Laser Dentistry</div>
+                </div>
+                <div class="image-card">
+                    <img
+                    src="https://tse4.mm.bing.net/th/id/OIP.Q2ni-rceC7H7lUxcifil4wHaF7?cb=thfc1falcon2&rs=1&pid=ImgDetMain&o=7&rm=3"
+                    alt="Endodontics"
+                    loading="lazy"
+                    />
+                    <div class="overlay">Endodontics</div>
                 </div>
             </div>
+        </section>
 
-            <!-- Slide 3: Advanced Cosmetics -->
-            <div class="content-slide" data-progress="60">
-                <h2>Clinical <span>Expertise</span></h2>
-                <p>Mastered precision Cosmetics & Implant systems at MSA University and Mediance Academy. Fully proficient in Laser dentistry, full-arch implants (All-on-4/6), veneers, and digital smile design workflow.</p>
-                <div class="badges">
-                    <span class="badge">All-on-4/6 Implant</span>
-                    <span class="badge">Microscopic Endodontics</span>
-                    <span class="badge">Laser & Botox</span>
-                </div>
-            </div>
+        <!-- ====== EXPERIENCE (Ordered Newest to Oldest) ====== -->
+        <section id="experience">
+            <div class="section-label">Career</div>
+            <h2 class="section-title">Clinical <span class="accent">Experience</span></h2>
+            <div class="exp-grid">
 
-            <!-- Slide 4: Global & Linguistics -->
-            <div class="content-slide" data-progress="80">
-                <h2>Global <span>Standards</span></h2>
-                <p>Equipped with international practice standards, verified via a professional TOEFL certification. Native Arabic fluency combined with professional English proficiency and advanced French capabilities.</p>
-                <div class="badges">
-                    <span class="badge">TOEFL Certified</span>
-                    <span class="badge">English & French</span>
-                    <span class="badge">IDEX Speaker/Leader</span>
-                </div>
-            </div>
-
-            <!-- Fake Video Controls Integration -->
-            <div class="video-controls">
-                <div class="timeline-bar" onclick="resetTimeline()">
-                    <div class="timeline-progress" id="progress-bar"></div>
-                </div>
-                <div class="control-buttons">
-                    <div class="left-controls">
-                        <button class="play-btn" id="playBtn">⏸</button>
-                        <span style="font-size: 0.85rem; color:#8a99ad;">0:02 / 0:10 • Auto-Playing Loop</span>
+                <!-- 1. NEWEST: Oral and Maxillofacial Surgery Resident -->
+                <div class="exp-item">
+                    <div class="exp-left">02/2026 – 06/2026</div>
+                    <div class="exp-right">
+                        <h3>Oral And Maxillofacial Surgery Resident</h3>
+                        <div class="org">Kasr Al Ainy Hospital</div>
+                        <div class="desc">Visiting Deputy in the Department of Oral and Maxillofacial Surgery. Achieved an evaluation score of 95%.</div>
+                        <div class="tags">
+                            <span>Oral Surgery</span>
+                            <span>Maxillofacial</span>
+                            <span>Resident</span>
+                            <span>95% Score</span>
+                        </div>
                     </div>
-                    <div style="font-size:0.85rem; color: var(--primary);">1080p HD</div>
+                </div>
+
+                <!-- 2. Cosmetics Diploma -->
+                <div class="exp-item">
+                    <div class="exp-left">2022 – 2023</div>
+                    <div class="exp-right">
+                        <h3>Cosmetics Diploma</h3>
+                        <div class="org">Mediance Academy for Medical Training</div>
+                        <div class="desc">Laser · Aesthetics · Anterior &amp; posterior composite · Soft tissue graft · Veneer · Dental photography · Digital dentistry · Botox &amp; Filler</div>
+                        <div class="tags">
+                            <span>Laser</span>
+                            <span>Veneer</span>
+                            <span>Digital dentistry</span>
+                            <span>Botox &amp; Filler</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Implant Internships' round -->
+                <div class="exp-item">
+                    <div class="exp-left">2022 – 2023</div>
+                    <div class="exp-right">
+                        <h3>Implant Internships' round</h3>
+                        <div class="org">MSA University</div>
+                        <div class="desc">All‑on‑6 · All‑on‑4 · Single implant</div>
+                        <div class="tags">
+                            <span>All‑on‑6</span>
+                            <span>All‑on‑4</span>
+                            <span>Single implant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Endodontics -->
+                <div class="exp-item">
+                    <div class="exp-left">2022 – 2023</div>
+                    <div class="exp-right">
+                        <h3>Endodontics</h3>
+                        <div class="org">MSA University</div>
+                        <div class="desc">Using Biomaterials · Using microscope in Endodontics</div>
+                        <div class="tags">
+                            <span>Biomaterials</span>
+                            <span>Microscope</span>
+                            <span>Endodontics</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Orthodontic -->
+                <div class="exp-item">
+                    <div class="exp-left">2022 – 2023</div>
+                    <div class="exp-right">
+                        <h3>Orthodontic</h3>
+                        <div class="org">MSA University</div>
+                        <div class="desc">Diagnosis · Orthopedic appliances</div>
+                        <div class="tags">
+                            <span>Diagnosis</span>
+                            <span>Orthopedic appliances</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. IDEX Conference -->
+                <div class="exp-item">
+                    <div class="exp-left">2021 – 2022</div>
+                    <div class="exp-right">
+                        <h3>IDEX Conference</h3>
+                        <div class="org">IDEX</div>
+                        <div class="desc">Aesthetics program · Implant program</div>
+                        <div class="tags">
+                            <span>Aesthetics</span>
+                            <span>Implant</span>
+                            <span>Conference</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. OLDEST: Heros, M.U.N and Theater activities -->
+                <div class="exp-item">
+                    <div class="exp-left">2018 – 2022</div>
+                    <div class="exp-right">
+                        <h3>Heros, M.U.N and Theater activities</h3>
+                        <div class="org">MSA University</div>
+                        <div class="desc">Sales Management · Interviewer · Communication</div>
+                        <div class="tags">
+                            <span>Sales Management</span>
+                            <span>Interviewer</span>
+                            <span>Communication</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ====== EDUCATION ====== -->
+        <section id="education">
+            <div class="section-label">Academics</div>
+            <h2 class="section-title">Education &amp; <span class="accent">Training</span></h2>
+            <div class="card-grid two">
+                <div class="card">
+                    <span class="tag">Bachelor</span>
+                    <h3>Bachelor and internship</h3>
+                    <div class="sub">MSA University · 2021 – 2023</div>
+                    <div class="desc">Comprehensive training in all dental disciplines with clinical rotations.</div>
+                    <div class="year">Graduated with honors</div>
+                </div>
+                <div class="card">
+                    <span class="tag">Internship</span>
+                    <h3>Clinical Internship</h3>
+                    <div class="sub">MSA University · 2021 – 2023</div>
+                    <div class="desc">Hands‑on patient care under supervision, covering all major specialties.</div>
+                    <div class="year">Completed 1000+ clinical hours</div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Interactive Playlist Chapters Panel -->
-        <div class="playlist-sidebar">
-            <div class="sidebar-header">
-                <h3>REEL CHAPTERS</h3>
-                <p style="font-size:0.8rem; color:#8a99ad; margin-top:4px;">Select to skip directly to section</p>
+        <!-- ====== CERTIFICATES ====== -->
+        <section id="certificates">
+            <div class="section-label">Credentials</div>
+            <h2 class="section-title">Certificates &amp; <span class="accent">Licenses</span></h2>
+            <div class="card-grid two">
+                <div class="card">
+                    <span class="tag">Language</span>
+                    <h3>TOEFL</h3>
+                    <div class="sub">English language proficiency certification</div>
+                    <div class="desc">Validates advanced English communication skills for academic and professional settings.</div>
+                    <!-- ✅ UPDATED YEAR -->
+                    <div class="year">Issued: 2026</div>
+                </div>
             </div>
-            <ul class="chapter-list">
-                <li class="chapter-item active" onclick="changeSlide(0)">
-                    <div class="chapter-thumb">01 / 04</div>
-                    <div class="chapter-info">
-                        <h4>Profile Overview</h4>
-                        <p>Summary & Focus</p>
-                    </div>
-                </li>
-                <li class="chapter-item" onclick="changeSlide(1)">
-                    <div class="chapter-thumb">02 / 04</div>
-                    <div class="chapter-info">
-                        <h4>Maxillofacial Residency</h4>
-                        <p>Al-Qasr Al-Ainy (95%)</p>
-                    </div>
-                </li>
-                <li class="chapter-item" onclick="changeSlide(2)">
-                    <div class="chapter-thumb">03 / 04</div>
-                    <div class="chapter-info">
-                        <h4>Cosmetics & Implants</h4>
-                        <p>Clinical Mastery Courses</p>
-                    </div>
-                </li>
-                <li class="chapter-item" onclick="changeSlide(3)">
-                    <div class="chapter-thumb">04 / 04</div>
-                    <div class="chapter-info">
-                        <h4>Linguistics & Certs</h4>
-                        <p>TOEFL & Global Skills</p>
-                    </div>
-                </li>
-            </ul>
-        </div>
+        </section>
+
+        <!-- ====== SKILLS ====== -->
+        <section id="skills">
+            <div class="section-label">Expertise</div>
+            <h2 class="section-title">Clinical &amp; <span class="accent">Professional Skills</span></h2>
+            <div class="skills-wrap">
+                <span class="skill-tag"><span class="dot"></span>Management</span>
+                <span class="skill-tag"><span class="dot"></span>Marketing</span>
+                <span class="skill-tag"><span class="dot"></span>Singing</span>
+                <span class="skill-tag"><span class="dot"></span>Problem Solving</span>
+                <span class="skill-tag"><span class="dot"></span>ICDL</span>
+                <span class="skill-tag"><span class="dot"></span>Leadership</span>
+            </div>
+        </section>
+
+        <!-- ====== LANGUAGES ====== -->
+        <section id="languages">
+            <div class="section-label">Communication</div>
+            <h2 class="section-title">Languages</h2>
+            <div class="lang-card">
+                <div class="lang-item">
+                    <span class="name">English</span>
+                    <span class="level">
+                        Proficient
+                        <span class="bars">
+                            <span class="fill"></span>
+                            <span class="fill"></span>
+                            <span class="fill"></span>
+                            <span class="fill"></span>
+                            <span></span>
+                        </span>
+                    </span>
+                </div>
+                <div class="lang-item">
+                    <span class="name">French</span>
+                    <span class="level">
+                        Advanced
+                        <span class="bars">
+                            <span class="fill"></span>
+                            <span class="fill"></span>
+                            <span class="fill"></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </span>
+                </div>
+                <div class="lang-item">
+                    <span class="name">Arabic</span>
+                    <span class="level">
+                        Native
+                        <span class="bars">
+                            <span class="fill"></span>
+                            <span class="fill"></span>
+                            <span class="fill"></span>
+                            <span class="fill"></span>
+                            <span class="fill"></span>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== FOOTER ====== -->
+        <footer>
+            <span>✦ Dr. Taha Khalifa · 2026 · Dental Portfolio</span>
+        </footer>
+
     </div>
 
+    <!-- ─── THEME TOGGLE ─── -->
     <script>
-        const slides = document.querySelectorAll('.content-slide');
-        const chapters = document.querySelectorAll('.chapter-item');
-        const progressBar = document.getElementById('progress-bar');
-        const playBtn = document.getElementById('playBtn');
-        let currentIdx = 0;
-        let isPlaying = true;
+        (function() {
+            // Main theme toggle logic
+            const html = document.documentElement;
+            const storageKey = 'theme-preference';
+            const toggleButtons = document.querySelectorAll('.theme-toggle-mini');
 
-        function changeSlide(idx) {
-            slides[currentIdx].classList.remove('active');
-            chapters[currentIdx].classList.remove('active');
-            
-            currentIdx = idx;
-            
-            slides[currentIdx].classList.add('active');
-            chapters[currentIdx].classList.add('active');
-            
-            const progressVal = slides[currentIdx].getAttribute('data-progress');
-            progressBar.style.width = `${progressVal}%`;
-        }
+            const getPreferredTheme = () => {
+                const stored = localStorage.getItem(storageKey);
+                if (stored) return stored;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
 
-        // Toggle Play/Pause UI Simulation
-        playBtn.addEventListener('click', () => {
-            isPlaying = !isPlaying;
-            playBtn.innerText = isPlaying ? '⏸' : '▶';
-        });
+            const setTheme = (theme) => {
+                html.setAttribute('data-theme', theme);
+                localStorage.setItem(storageKey, theme);
+            };
 
-        // Simple Automated loop simulating playback
-        setInterval(() => {
-            if(isPlaying){
-                let next = (currentIdx + 1) % slides.length;
-                changeSlide(next);
-            }
-        }, 3500);
+            setTheme(getPreferredTheme());
+
+            toggleButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const current = html.getAttribute('data-theme');
+                    const next = current === 'light' ? 'dark' : 'light';
+                    setTheme(next);
+                });
+            });
+
+            const media = window.matchMedia('(prefers-color-scheme: dark)');
+            media.addEventListener('change', (e) => {
+                if (!localStorage.getItem(storageKey)) {
+                    setTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        })();
     </script>
+
+    <!-- ─── NAVBAR TOGGLE ─── -->
+    <script>
+        (function() {
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('navMenu');
+
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+
+            // Close menu on link click (mobile)
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('active');
+                });
+            });
+
+            // Close menu on outside click
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.navbar')) {
+                    navMenu.classList.remove('active');
+                }
+            });
+        })();
+    </script>
+
+    <!-- ─── SCROLL REVEAL ─── -->
+    <script>
+        (function() {
+            const sections = document.querySelectorAll('section');
+
+            const reveal = () => {
+                const trigger = window.innerHeight * 0.88;
+                sections.forEach((sec) => {
+                    const top = sec.getBoundingClientRect().top;
+                    if (top < trigger) {
+                        sec.classList.add('visible');
+                    }
+                });
+            };
+
+            reveal();
+
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        reveal();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+
+            window.addEventListener('resize', reveal);
+        })();
+    </script>
+
 </body>
 </html>
